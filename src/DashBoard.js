@@ -4,6 +4,23 @@
   import Header from './Header';
 
   function DashBoard() {
+  // Estado para el diálogo de autorización
+  const [showAuthDialog, setShowAuthDialog] = useState(true);
+  const [authUser, setAuthUser] = useState('');
+  const [authPass, setAuthPass] = useState('');
+  const [authError, setAuthError] = useState('');
+
+  // Simulación de autorización
+  const handleAuth = (e) => {
+    e.preventDefault();
+    // Mock: usuario admin, pass 1234
+    if (authUser === 'admin' && authPass === '1234') {
+      setShowAuthDialog(false);
+      setAuthError('');
+    } else {
+      setAuthError('Usuario o contraseña incorrectos');
+    }
+  };
   // Estado para descripción normativa de enlaces
   const [linkNormDesc, setLinkNormDesc] = useState('');
   const [linkNormDescs, setLinkNormDescs] = useState({});
@@ -101,60 +118,96 @@
     return (
     <div className={styles.mainContainer}>
       <Header />
-      <div className={styles.flexContainer}>
-        {/* Sección de selección de empresa */}
-        <section className={styles.section}>
-          <h2 className={styles.title}>Seleccionar Empresa</h2>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <select
-              className={styles.input}
-              value={selectedCompany}
-              onChange={e => setSelectedCompany(e.target.value)}
-              style={{ minWidth: 180 }}
-            >
-              {companies.map((company, idx) => (
-                <option key={idx} value={company}>{company}</option>
-              ))}
-            </select>
-            <button className={styles.sendButton} onClick={() => setShowAddDialog(true)}>Agregar Empresa</button>
-            <button className={styles.actionButton} onClick={() => setShowDeleteDialog(true)} disabled={!selectedCompany}>Eliminar Seleccionada</button>
+      {/* Dialogo de autorización */}
+      {showAuthDialog && (
+        <div className={styles.dialogOverlay}>
+          <div className={styles.dialog}>
+            <h3>Autorización requerida</h3>
+            <form onSubmit={handleAuth} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <label>
+                Usuario:
+                <input
+                  type="text"
+                  className={styles.input}
+                  value={authUser}
+                  onChange={e => setAuthUser(e.target.value)}
+                  autoFocus
+                  required
+                />
+              </label>
+              <label>
+                Contraseña:
+                <input
+                  type="password"
+                  className={styles.input}
+                  value={authPass}
+                  onChange={e => setAuthPass(e.target.value)}
+                  required
+                />
+              </label>
+              {authError && <div style={{ color: 'red', fontSize: '0.95rem' }}>{authError}</div>}
+              <button type="submit" className={styles.sendButton}>Autorizar</button>
+            </form>
           </div>
-        </section>
-
-        {/* Dialogo para agregar empresa */}
-        {showAddDialog && (
-          <div className={styles.dialogOverlay}>
-            <div className={styles.dialog}>
-              <h3>Agregar nueva empresa</h3>
-              <input
+        </div>
+      )}
+      {!showAuthDialog && (
+        <div className={styles.flexContainer}>
+          {/* Sección de selección de empresa */}
+          <section className={styles.section}>
+            <h2 className={styles.title}>Seleccionar Empresa</h2>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <select
                 className={styles.input}
-                type="text"
-                placeholder="Nombre de la empresa"
-                value={newCompanyName}
-                onChange={e => setNewCompanyName(e.target.value)}
-                autoFocus
-              />
-              <div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
-                <button className={styles.sendButton} onClick={handleAddCompany} disabled={!newCompanyName}>Confirmar</button>
-                <button className={styles.actionButton} onClick={() => setShowAddDialog(false)}>Cancelar</button>
-              </div>
+                value={selectedCompany}
+                onChange={e => setSelectedCompany(e.target.value)}
+                style={{ minWidth: 180 }}
+              >
+                {companies.map((company, idx) => (
+                  <option key={idx} value={company}>{company}</option>
+                ))}
+              </select>
+              <button className={styles.sendButton} onClick={() => setShowAddDialog(true)}>Agregar Empresa</button>
+              <button className={styles.actionButton} onClick={() => setShowDeleteDialog(true)} disabled={!selectedCompany}>Eliminar Seleccionada</button>
             </div>
-          </div>
-        )}
+          </section>
 
-        {/* Dialogo para eliminar empresa */}
-        {showDeleteDialog && (
-          <div className={styles.dialogOverlay}>
-            <div className={styles.dialog}>
-              <h3>¿Eliminar la empresa seleccionada?</h3>
-              <p>Esta acción no se puede deshacer.</p>
-              <div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
-                <button className={styles.sendButton} onClick={handleDeleteCompany}>Eliminar</button>
-                <button className={styles.actionButton} onClick={() => setShowDeleteDialog(false)}>Cancelar</button>
+          {/* Dialogo para agregar empresa */}
+          {showAddDialog && (
+            <div className={styles.dialogOverlay}>
+              <div className={styles.dialog}>
+                <h3>Agregar nueva empresa</h3>
+                <input
+                  className={styles.input}
+                  type="text"
+                  placeholder="Nombre de la empresa"
+                  value={newCompanyName}
+                  onChange={e => setNewCompanyName(e.target.value)}
+                  autoFocus
+                />
+                <div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
+                  <button className={styles.sendButton} onClick={handleAddCompany} disabled={!newCompanyName}>Confirmar</button>
+                  <button className={styles.actionButton} onClick={() => setShowAddDialog(false)}>Cancelar</button>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+
+          {/* Dialogo para eliminar empresa */}
+          {showDeleteDialog && (
+            <div className={styles.dialogOverlay}>
+              <div className={styles.dialog}>
+                <h3>¿Eliminar la empresa seleccionada?</h3>
+                <p>Esta acción no se puede deshacer.</p>
+                <div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
+                  <button className={styles.sendButton} onClick={handleDeleteCompany}>Eliminar</button>
+                  <button className={styles.actionButton} onClick={() => setShowDeleteDialog(false)}>Cancelar</button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Sección de gestión de archivos */}
           <section className={styles.section}>
             <h2 className={styles.title}>Gestión de Archivos</h2>
             {/* Descripción normativa */}
@@ -191,7 +244,7 @@
             </table>
           </section>
 
-          {/* Sección de Gestión de Enlaces */}
+          {/* Sección de gestión de enlaces */}
           <section className={styles.section}>
             <h2 className={styles.title}>Gestión de Enlaces</h2>
             <form onSubmit={handleAddLink} style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 16 }}>
@@ -265,46 +318,46 @@
             <button className={styles.sendButton} onClick={() => alert('Generando y descargando cartel QR...')}>Generar y Descargar</button>
           </section>
 
-        <section className={styles.section}>
-          <h3 className={styles.subtitle}>Documentación de la Empresa{selectedCompany ? `: ${selectedCompany}` : ''}</h3>
-          <div className={styles.tableWrapper}>
-            <table className={`${styles.table} ${styles.responsiveTable}`}>
-              <thead>
-                <tr>
-                  <th className={styles.thTd}>Nombre</th>
-                  <th className={styles.thTd}>Normativa</th>
-                  <th className={styles.thTd}>Acción</th>
-                </tr>
-              </thead>
-              <tbody>
-                {files.map((file, idx) => (
-                  <tr key={idx} className={idx % 2 === 0 ? styles.rowEven : styles.rowOdd}>
-                    <td className={styles.thTd}>{file.name}</td>
-                    <td className={styles.thTd}>
-                      <button className={styles.actionButton} onClick={() => handleShowNorm(file)}>Ver</button>
-                    </td>
-                    <td className={styles.thTd}><button className={styles.actionButton} onClick={() => handleRemove(idx)}>Remove</button></td>
+          <section className={styles.section}>
+            <h3 className={styles.subtitle}>Documentación de la Empresa{selectedCompany ? `: ${selectedCompany}` : ''}</h3>
+            <div className={styles.tableWrapper}>
+              <table className={`${styles.table} ${styles.responsiveTable}`}>
+                <thead>
+                  <tr>
+                    <th className={styles.thTd}>Nombre</th>
+                    <th className={styles.thTd}>Normativa</th>
+                    <th className={styles.thTd}>Acción</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        {/* Dialogo para ver normativa */}
-        {showNormDialog && (
-          <div className={styles.dialogOverlay}>
-            <div className={styles.dialog}>
-              <h3>Descripción de la normativa</h3>
-              <div style={{ margin: '16px 0', whiteSpace: 'pre-line' }}>{normDescToShow}</div>
-              <button className={styles.sendButton} onClick={() => setShowNormDialog(false)}>Cerrar</button>
+                </thead>
+                <tbody>
+                  {files.map((file, idx) => (
+                    <tr key={idx} className={idx % 2 === 0 ? styles.rowEven : styles.rowOdd}>
+                      <td className={styles.thTd}>{file.name}</td>
+                      <td className={styles.thTd}>
+                        <button className={styles.actionButton} onClick={() => handleShowNorm(file)}>Ver</button>
+                      </td>
+                      <td className={styles.thTd}><button className={styles.actionButton} onClick={() => handleRemove(idx)}>Remove</button></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          </div>
-        )}
+          </section>
 
+          {/* Dialogo para ver normativa */}
+          {showNormDialog && (
+            <div className={styles.dialogOverlay}>
+              <div className={styles.dialog}>
+                <h3>Descripción de la normativa</h3>
+                <div style={{ margin: '16px 0', whiteSpace: 'pre-line' }}>{normDescToShow}</div>
+                <button className={styles.sendButton} onClick={() => setShowNormDialog(false)}>Cerrar</button>
+              </div>
+            </div>
+          )}
         </div>
-      </div>
-    );
-  }
+      )}
+    </div>
+  );
+}
 
-  export default DashBoard;
+export default DashBoard;
